@@ -1,4 +1,5 @@
 var express = require('express');
+var _ = require('underscore');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var sessions = require('express-session');
@@ -70,16 +71,63 @@ function(req, res) {
 app.post('/login', function(req, res){
   var username = req.body.username;
   var password = req.body.password;
+  console.log("username & password: ", username, password)
 
-  var user = Users.findWhere({username: username});
+  Users
+    .query('where', 'username', '=', username)
+    .fetch()
+    .then(function(result) {
+      console.log(result.models[0].get('username'));
+      console.log(result.models[0].get('password'));
 
-  console.log("user password ", user.checkPassword(password));
 
-  if(user.checkPassword(password)){
-    res.redirect('/');
-  } else {
-    res.redirect('/login');
-  }
+
+    });
+  // if (result.models[0].checkPassword(password)) {
+  //       res.redirect('/');
+  //     } else {
+  //       res.redirect('/login');
+  //     }
+  // var filtr = _.filter(Users, function(model){
+  //   console.log(model);
+  //   if(model.get('username') === username){
+  //     return true;
+  //   }
+  // });
+
+  // console.log(filtr);
+
+  // Users.fetch().then(function(data){
+  //   _.filter(data.models, function(model){
+  //       console.log(model);
+  //       if(model.get('username') === username){
+  //         console.log(model);
+  //         if(model.checkPassword(password)){
+  //           res.redirect('/');
+  //         } else {
+  //           res.redirect('/login');
+  //         }
+  //       }
+  //   });
+  // })
+  // .then(function(){
+  //   console.log("user not found");
+  //   res.redirect('/login');
+  // });
+
+
+  // console.log(user);
+  // });
+
+  // var user = Users.findWhere({username: usrname});
+
+  // console.log("user password ", user); //user.checkPassword(password));
+
+  // if(user.checkPassword(password)){
+  //   res.redirect('/');
+  // } else {
+  //   res.redirect('/login');
+  // }
 
 });
 
@@ -92,6 +140,7 @@ app.post('/signup', function(req, res) {
     username: username,
     password: password
   });
+
   user.save().then(function(newUser) {
     Users.add(newUser);
     req.session.regenerate(function(err) {

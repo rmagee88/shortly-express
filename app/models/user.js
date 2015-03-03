@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt-nodejs');
 var crypto = require('crypto');
 var Promise = require('bluebird');
 var Link = require('./link');
+// promisify bcrypt?
 
 var User = db.Model.extend({
   tableName: 'users',
@@ -21,22 +22,25 @@ var User = db.Model.extend({
         if(err) {
           console.log("bcrypt error ", err);
         }
+        // return bcrypt & .then callback to set password (null for salt?)
         bcrypt.hash(model.get('password'), salt, null, function(err, hash) {
           console.log("bcrypt hash error ", err);
+          console.log("hash", hash);
+          console.log('hash type: ', typeof hash);
           model.set('password', hash);
-        });
-      });
 
-      // var shasum = crypto.createHash('sha1');
-      // shasum.update(model.get('password'));
-      // model.set('password', shasum.digest('hex'));
-    });
-  },
-  checkPassword: function(password){
-    return bcrypt.compare(password, model.get('password'), function(err, res){
-      return res;
+        });
+
+      });
     });
   }
+  // ,
+  // checkPassword: function(password){
+  //   console.log(this.get('password'));
+  //   bcrypt.compare(password, hash, function(err, res){
+  //     console.log(res);
+  //   });
+  // }
 
 });
 
