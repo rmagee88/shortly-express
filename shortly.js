@@ -30,7 +30,24 @@ app.use(sessions({secret: 'test'}));
 app.get('/',
 function(req, res) {
   console.log('session object: ', req.session);
-  res.render('index');
+  if (!req.session.username) {
+    res.redirect('/login');
+  } else {
+    res.render('index');
+  }
+
+});
+
+app.get('/login',
+function(req, res) {
+  res.render('login');
+
+});
+
+app.get('/signup',
+function(req, res) {
+  res.render('signup');
+
 });
 
 app.get('/create',
