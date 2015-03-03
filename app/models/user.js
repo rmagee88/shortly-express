@@ -17,9 +17,24 @@ var User = db.Model.extend({
   },
   initialize: function() {
     this.on('creating', function(model, attr, options){
-      var shasum = crypto.createHash('sha1');
-      shasum.update(model.get('password'));
-      model.set('password', shasum.digest('hex'));
+      bcrypt.genSalt(10, function(err, salt) {
+        if(err) {
+          console.log("bcrypt error ", err);
+        }
+        bcrypt.hash(model.get('password'), salt, null, function(err, hash) {
+          console.log("bcrypt hash error ", err);
+          model.set('password', hash);
+        });
+      });
+
+      // var shasum = crypto.createHash('sha1');
+      // shasum.update(model.get('password'));
+      // model.set('password', shasum.digest('hex'));
+    });
+  },
+  checkPassword: function(password){
+    return bcrypt.compare(password, model.get('password'), function(err, res){
+      return res;
     });
   }
 

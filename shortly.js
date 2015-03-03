@@ -67,6 +67,22 @@ function(req, res) {
   }
 });
 
+app.post('/login', function(req, res){
+  var username = req.body.username;
+  var password = req.body.password;
+
+  var user = Users.findWhere({username: username});
+
+  console.log("user password ", user.checkPassword(password));
+
+  if(user.checkPassword(password)){
+    res.redirect('/');
+  } else {
+    res.redirect('/login');
+  }
+
+});
+
 app.post('/signup', function(req, res) {
   console.log(req.body);
   var username = req.body.username;
