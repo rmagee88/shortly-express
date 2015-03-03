@@ -1,7 +1,9 @@
 var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
+var sessions = require('express-session');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 
 
 var db = require('./app/config');
@@ -21,10 +23,13 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+app.use(cookieParser());
+app.use(sessions({secret: 'test'}));
 
 
 app.get('/',
 function(req, res) {
+  console.log('session object: ', req.session);
   res.render('index');
 });
 
@@ -45,18 +50,18 @@ function(req, res) {
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
-    console.log('Not a valid url: ', uri);
+    // console.log('Not a valid url: ', uri);
     return res.send(404);
   }
 
   new Link({ url: uri }).fetch().then(function(found) {
     if (found) {
-      console.log('new link attributes: ', found.attributes);
+      // console.log('new link attributes: ', found.attributes);
       res.send(200, found.attributes);
     } else {
-      console.log('link not found in db...');
+      // console.log('link not found in db...');
       util.getUrlTitle(uri, function(err, title) {
-        console.log('title is: ', title);
+        // console.log('title is: ', title);
         if (err) {
           console.log('Error reading URL heading: ', err);
           return res.send(404);
@@ -69,7 +74,7 @@ function(req, res) {
         });
 
         link.save().then(function(newLink) {
-          console.log('new link saved: ', newLink);
+          // console.log('new link saved: ', newLink);
           Links.add(newLink);
           res.send(200, newLink);
         });

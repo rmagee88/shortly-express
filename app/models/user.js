@@ -1,5 +1,6 @@
 var db = require('../config');
 var bcrypt = require('bcrypt-nodejs');
+var crypto = require('crypto');
 var Promise = require('bluebird');
 var Link = require('./link');
 
@@ -13,7 +14,7 @@ var User = db.Model.extend({
   initialize: function(password) {
     this.on('creating', function(model, attr, options){
       var shasum = crypto.createHash('sha1');
-      shasum.update(model.get(password));
+      shasum.update('test');//model.get(password));
       model.set('password', shasum.digest('hex'));
     });
   }
