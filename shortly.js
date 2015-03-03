@@ -79,15 +79,20 @@ app.post('/login', function(req, res){
     .then(function(result) {
       console.log(result.models[0].get('username'));
       console.log(result.models[0].get('password'));
+      result.models[0].checkPassword(password).then(function(match){
+        console.log("match: ", match);
+        if (match) {
+          req.session.regenerate(function(err) {
+            if (err) console.log('session regenerate error: ', err);
+            req.session.username = result.models[0].get('username');
+            res.redirect('/');
+          });
 
-
-
+        } else {
+          res.redirect('/login');
+        }
+      });
     });
-  // if (result.models[0].checkPassword(password)) {
-  //       res.redirect('/');
-  //     } else {
-  //       res.redirect('/login');
-  //     }
   // var filtr = _.filter(Users, function(model){
   //   console.log(model);
   //   if(model.get('username') === username){
@@ -141,12 +146,16 @@ app.post('/signup', function(req, res) {
     password: password
   });
 
-  user.save().then(function(newUser) {
-    Users.add(newUser);
-    req.session.regenerate(function(err) {
-      if (err) console.log('session regenerate error: ', err);
-      req.session.username = newUser.get('username');
-      res.redirect('/');
+  user.hashPassword().then(function(model) {
+    model.save().then(function(newUser) {
+      Users.add(newUser);
+      console.log('saving user: ', newUser.get('username'));
+      console.log('saving pword: ', newUser.get('password'));
+      req.session.regenerate(function(err) {
+        if (err) console.log('session regenerate error: ', err);
+        req.session.username = newUser.get('username');
+        res.redirect('/');
+      });
     });
   });
 });
