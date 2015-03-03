@@ -16,17 +16,7 @@ var User = db.Model.extend({
   links: function() {
     return this.hasMany(Link);
   },
-  initialize: function() {
-    // this.on('creating', function(model, attr, options){
-    //   // return bcrypt & .then callback to set password (null for salt?)
-    //   bcrypt.hashAsync(model.get('password'), null, null).then(function(hash) {
-    //     // console.log("bcrypt hash error ", err);
-    //     console.log("hash", hash);
-    //     console.log('hash type: ', typeof hash);
-    //     model.set('password', hash);
-    //   });
-    // });
-  },
+  initialize: function() {},
   hashPassword: function() {
     model = this;
     console.log("model :", model);

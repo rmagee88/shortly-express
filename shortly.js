@@ -31,6 +31,7 @@ app.use(sessions({secret: 'test'}));
 app.get('/',
 function(req, res) {
   // console.log('session object: ', req.session);
+  console.log('/ username: ', req.session.username);
   if (!req.session.username) {
     res.redirect('/login');
   } else {
@@ -38,18 +39,24 @@ function(req, res) {
   }
 });
 
-app.get('/login',
-function(req, res) {
-  res.render('login');
+app.get('/login', function(req, res) {
+  console.log('/login username: ', req.session.username);
+  util.checkUser(req, res, "/", 'login', 'redirect', 'render');
 });
 
-app.get('/signup',
-function(req, res) {
+app.get('/logout', function(req, res) {
+  console.log('/logout username: ', req.session.username);
+  req.session.destroy(function() {
+    res.redirect('/login');
+  });
+});
+
+app.get('/signup', function(req, res) {
   res.render('signup');
 });
 
-app.get('/create',
-function(req, res) {
+app.get('/create',function(req, res) {
+
   if (!req.session.username) {
     res.redirect('/login');
   } else {
@@ -57,8 +64,8 @@ function(req, res) {
   }
 });
 
-app.get('/links',
-function(req, res) {
+app.get('/links', function(req, res) {
+
   if (!req.session.username) {
     res.redirect('/login');
   } else {
@@ -93,47 +100,6 @@ app.post('/login', function(req, res){
         }
       });
     });
-  // var filtr = _.filter(Users, function(model){
-  //   console.log(model);
-  //   if(model.get('username') === username){
-  //     return true;
-  //   }
-  // });
-
-  // console.log(filtr);
-
-  // Users.fetch().then(function(data){
-  //   _.filter(data.models, function(model){
-  //       console.log(model);
-  //       if(model.get('username') === username){
-  //         console.log(model);
-  //         if(model.checkPassword(password)){
-  //           res.redirect('/');
-  //         } else {
-  //           res.redirect('/login');
-  //         }
-  //       }
-  //   });
-  // })
-  // .then(function(){
-  //   console.log("user not found");
-  //   res.redirect('/login');
-  // });
-
-
-  // console.log(user);
-  // });
-
-  // var user = Users.findWhere({username: usrname});
-
-  // console.log("user password ", user); //user.checkPassword(password));
-
-  // if(user.checkPassword(password)){
-  //   res.redirect('/');
-  // } else {
-  //   res.redirect('/login');
-  // }
-
 });
 
 app.post('/signup', function(req, res) {
