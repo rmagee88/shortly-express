@@ -29,36 +29,60 @@ app.use(sessions({secret: 'test'}));
 
 app.get('/',
 function(req, res) {
-  console.log('session object: ', req.session);
+  // console.log('session object: ', req.session);
   if (!req.session.username) {
     res.redirect('/login');
   } else {
     res.render('index');
   }
-
 });
 
 app.get('/login',
 function(req, res) {
   res.render('login');
-
 });
 
 app.get('/signup',
 function(req, res) {
   res.render('signup');
-
 });
 
 app.get('/create',
 function(req, res) {
-  res.render('index');
+  if (!req.session.username) {
+    res.redirect('/login');
+  } else {
+    res.render('index');
+  }
 });
 
 app.get('/links',
 function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.send(200, links.models);
+  if (!req.session.username) {
+    res.redirect('/login');
+  } else {
+    Links.reset().fetch().then(function(links) {
+      res.send(200, links.models);
+    });
+  }
+});
+
+app.post('/signup', function(req, res) {
+  console.log(req.body);
+  var username = req.body.username;
+  var password = req.body.password;
+
+  var user = new User({
+    username: username,
+    password: password
+  });
+  user.save().then(function(newUser) {
+    Users.add(newUser);
+    req.session.regenerate(function(err) {
+      if (err) console.log('session regenerate error: ', err);
+      req.session.username = newUser.get('username');
+      res.redirect('/');
+    });
   });
 });
 
