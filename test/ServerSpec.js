@@ -294,8 +294,10 @@ describe('', function() {
       new User({
           'username': 'Phillip',
           'password': 'Phillip'
-      }).save().then(function(){
-        done()
+      }).hashPassword().then(function(model){
+        model.save().then(function(){
+          done()
+        });
       });
     })
 

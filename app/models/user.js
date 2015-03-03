@@ -19,20 +19,14 @@ var User = db.Model.extend({
   initialize: function() {},
   hashPassword: function() {
     model = this;
-    console.log("model :", model);
     return bcrypt.hashAsync(model.get('password'), null, null).then(function(hash) {
-      // console.log("bcrypt hash error ", err);
-      console.log("hash", hash);
-      console.log('hash type: ', typeof hash);
       model.set('password', hash);
       return model;
     });
   },
 
   checkPassword: function(password){
-    console.log(this.get('password'));
     return bcrypt.compareAsync(password, this.get('password')).then(function(res){
-      console.log(res);
       return res;
     });
   }
