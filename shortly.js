@@ -51,11 +51,12 @@ app.get('/create',function(req, res) {
 });
 
 app.get('/links', function(req, res) {
-
-  if (!req.session.username) {
+  // change to only serve up the links made by a particular user.
+  // query the links collection
+  if (!req.session.user) {
     res.redirect('/login');
   } else {
-    Links.reset().fetch().then(function(links) {
+    Links.reset().query('where', 'user_id', '=', req.session.user.id).fetch().then(function(links) {
       res.send(200, links.models);
     });
   }
@@ -74,7 +75,7 @@ app.post('/login', function(req, res){
           if (match) {
             req.session.regenerate(function(err) {
               if (err) console.log('session regenerate error: ', err);
-              req.session.username = result.models[0].get('username');
+              req.session.user = result.models[0];
               res.redirect('/');
             });
 
@@ -102,7 +103,7 @@ app.post('/signup', function(req, res) {
       Users.add(newUser);
       req.session.regenerate(function(err) {
         if (err) console.log('session regenerate error: ', err);
-        req.session.username = newUser.get('username');
+        req.session.user = newUser;
         res.redirect('/');
       });
     });
@@ -111,6 +112,7 @@ app.post('/signup', function(req, res) {
 
 app.post('/links',
 function(req, res) {
+  var id = req.session.user.id;
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
@@ -130,7 +132,8 @@ function(req, res) {
         var link = new Link({
           url: uri,
           title: title,
-          base_url: req.headers.origin
+          base_url: req.headers.origin,
+          user_id: id
         });
 
         link.save().then(function(newLink) {
