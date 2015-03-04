@@ -119,7 +119,7 @@ function(req, res) {
     return res.send(404);
   }
 
-  new Link({ url: uri }).fetch().then(function(found) {
+  new Link({ url: uri, user_id: id }).fetch().then(function(found) {
     if (found) {
       res.send(200, found.attributes);
     } else {

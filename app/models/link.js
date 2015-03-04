@@ -3,6 +3,7 @@ var Click = require('./click');
 var User = require('./user');
 var crypto = require('crypto');
 var bcrypt = require('bcrypt-nodejs');
+var Promise = require('bluebird');
 
 var Link = db.Model.extend({
   tableName: 'urls',
@@ -18,11 +19,12 @@ var Link = db.Model.extend({
   },
   initialize: function(){
     this.on('creating', function(model, attrs, options){
-      // change to create unique ones for each user, needs a salt in the hash
-      var shasum = crypto.createHash('sha1');
-      shasum.update(model.get('url'));
-
-      model.set('code', shasum.digest('hex').slice(0, 5));
+      var cipher = Promise.promisify(bcrypt.hash);
+      return cipher(this.get('url'), null, null)
+        .bind(this)
+        .then(function(hash){
+          this.set('code', hash.slice(0,10));
+        });
     });
   }
 });
